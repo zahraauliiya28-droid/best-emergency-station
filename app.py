@@ -15,69 +15,21 @@ st.markdown(
     "Bobot adalah panjang jalan dalam meter, bukan waktu tempuh."
 )
 
-@st.cache_resource(show_spinner="Mengambil jaringan jalan OpenStreetMap untuk Lowokwaru…")
+@st.cache_resource
 def build_graph():
-    """Build a connected 20-node graph using the same broad method as the Colab notebook."""
-    place = "Lowokwaru, Malang, Jawa Timur, Indonesia"
-    area = ox.geocode_to_gdf(place)
-    try:
-        polygon = area.geometry.union_all()
-    except AttributeError:
-        polygon = area.geometry.unary_union
+    import pickle
+    from pathlib import Path
 
-    original = ox.graph_from_polygon(
-        polygon, network_type="drive", simplify=True, retain_all=True
-    )
-    graph = nx.Graph()
-    graph.graph.update(original.graph)
-    for u, v, data in original.edges(data=True):
-        if u == v:
-            continue
-        length = float(data.get("length", 1.0))
-        if length < 0:
-            raise ValueError("Bobot panjang jalan tidak boleh negatif.")
-        if not graph.has_edge(u, v) or length < graph[u][v]["length"]:
-            graph.add_edge(u, v, length=length)
-    graph.add_nodes_from((n, d.copy()) for n, d in original.nodes(data=True))
+    file_graf = Path(__file__).parent / "graf_emergency_station.pkl"
 
-    largest = max(nx.connected_components(graph), key=len)
-    connected = graph.subgraph(largest).copy()
-    coords = pd.DataFrame([
-        {"node": n, "x": connected.nodes[n]["x"], "y": connected.nodes[n]["y"]}
-        for n in connected.nodes()
-    ])
-    x_med, y_med = coords.x.median(), coords.y.median()
-    seed = min(
-        connected.nodes(),
-        key=lambda n: (connected.nodes[n]["x"] - x_med) ** 2
-        + (connected.nodes[n]["y"] - y_med) ** 2,
-    )
-    bfs_order = list(nx.bfs_tree(connected, source=seed).nodes())
-    chosen = bfs_order[:20]
-    H = connected.subgraph(chosen).copy()
-    if H.number_of_nodes() != 20 or not nx.is_connected(H):
-        raise ValueError("Subgraf hasil pengambilan data tidak memenuhi 20 simpul terhubung.")
-    if not all("length" in d and float(d["length"]) >= 0 for _, _, d in H.edges(data=True)):
-        raise ValueError("Ada bobot sisi yang tidak valid.")
+    with open(file_graf, "rb") as f:
+        data = pickle.load(f)
 
-    labels = {n: f"S{i+1}" for i, n in enumerate(H.nodes())}
-    pos = {n: (float(d["x"]), float(d["y"])) for n, d in H.nodes(data=True)}
-    coord_df = pd.DataFrame([
-        {"node": n, "x": pos[n][0], "y": pos[n][1]} for n in H.nodes()
-    ])
-    x_min, x_max = coord_df.x.min(), coord_df.x.max()
-    y_mid = coord_df.y.median()
-    targets = [x_min + .25 * (x_max - x_min), x_min + .75 * (x_max - x_min)]
-    candidate_nodes = {}
-    used = set()
-    candidate_names = ["Calon Pos A (barat)", "Calon Pos B (timur)"]
-    for name, target_x in zip(candidate_names, targets):
-        ordered = coord_df.assign(
-            score=(coord_df.x - target_x) ** 2 + (coord_df.y - y_mid) ** 2
-        ).sort_values("score")
-        node = next(n for n in ordered.node if n not in used)
-        used.add(node)
-        candidate_nodes[name] = node
+    H = data["H"]
+    labels = data["labels"]
+    pos = data["pos"]
+    candidate_nodes = data["candidates"]
+
     return H, labels, pos, candidate_nodes
 
 
