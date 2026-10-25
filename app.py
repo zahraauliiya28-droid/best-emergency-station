@@ -594,9 +594,6 @@ with col_info:
         f"{H_changed.number_of_nodes()} simpul terjangkau"
     )
 
-    st.caption(
-
-
 # =========================
 # PERBANDINGAN CALON POS
 # =========================
