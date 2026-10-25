@@ -24,11 +24,19 @@ st.markdown("""
 }
 .hero {
     background: linear-gradient(120deg, #10243A 0%, #173F67 62%, #2563EB 100%);
-    padding: 1.55rem 1.8rem;
+    padding: 1.8rem 1.8rem 1.55rem 1.8rem;
     border-radius: 20px;
     color: white;
     box-shadow: 0 12px 28px rgba(16,36,58,.16);
+    margin-top: 0.5rem;
     margin-bottom: 1rem;
+    overflow: visible;
+}
+.hero .eyebrow {
+    display: block;
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
 }
 .hero h1 {
     color: white;
@@ -187,10 +195,10 @@ def graph_figure(
         mode="markers+text",
         text=[labels[n] for n in node_list],
         textposition="top center",
-        textfont=dict(size=10, color="#334155"),
+        textfont=dict(size=9, color="#334155"),
         name="Persimpangan",
         marker=dict(
-            size=10,
+            size=9,
             color="#64748B",
             line=dict(color="white", width=1.5)
         ),
@@ -366,8 +374,8 @@ def graph_figure(
 
     # Tata letak graf
     fig.update_layout(
-        height=650,
-        margin=dict(l=35, r=25, t=90, b=55),
+        height=560,
+        margin=dict(l=45, r=25, t=75, b=45),
         showlegend=False,
         paper_bgcolor="white",
         plot_bgcolor="#F8FAFC",
@@ -397,7 +405,6 @@ def graph_figure(
     )
 
     return fig
-
 
 # Memuat data graf
 try:
@@ -455,7 +462,7 @@ st.sidebar.markdown(
     "⭐ Titik terjauh  \n"
     "🟠 Jalur terpendek  \n"
     "🟣 Ruas yang diubah  \n"
-    "🟠 Kendaraan animasi"
+    "🚑 Kendaraan animasi"
 )
 
 
@@ -560,44 +567,34 @@ with col_info:
     st.markdown("#### Keterangan graf")
 
     st.markdown(
-        "🟦 **Kotak biru** — calon pos terpilih  \n"
-        "🟩 **Berlian hijau** — pusat graf  \n"
-        "⭐ **Bintang merah** — titik terjauh  \n"
-        "🟠 **Garis oranye** — jalur terpendek  \n"
-        "🟣 **Garis ungu** — ruas yang diubah  \n"
-        "🟠 **Titik bergerak** — animasi kendaraan"
-    )
+    "🟦 **Kotak biru** — calon pos terpilih  \n"
+    "🟩 **Berlian hijau** — pusat graf  \n"
+    "⭐ **Bintang merah** — titik terjauh  \n"
+    "🟠 **Garis oranye** — jalur terpendek  \n"
+    "🟣 **Garis ungu** — ruas yang diubah  \n"
+    "🚑 **Titik bergerak** — animasi kendaraan"
+)
 
     st.divider()
     st.markdown("#### Informasi rute")
 
-    st.write(
-        f"**Calon pos:** {candidate_name}"
-    )
+    st.write(f"**Calon pos:** {candidate_name}")
+    st.write(f"**Titik terjauh:** {labels[changed_far]}")
 
-    st.write(
-        f"**Titik terjauh:** {labels[changed_far]}"
-    )
+    rute_meter = changed_dist[selected_node][changed_far]
 
-    st.write(
-        f"**Jarak terjauh:** "
-        f"{changed_dist[selected_node][changed_far]:,.2f} m"
-    )
-
-    st.write(
-        f"**Jarak dalam km:** "
-        f"{changed_dist[selected_node][changed_far] / 1000:.3f} km"
-    )
-
-    st.write(
-        f"**Jumlah simpul terjangkau:** "
-        f"{len(changed_dist[selected_node])}/{H_changed.number_of_nodes()}"
+    st.metric(
+        "Jarak terjauh",
+        f"{rute_meter / 1000:.3f} km"
     )
 
     st.caption(
-        "Panjang rute dihitung menggunakan algoritma Dijkstra "
-        "dengan bobot panjang jalan."
+        f"{rute_meter:,.2f} meter · "
+        f"{len(changed_dist[selected_node])}/"
+        f"{H_changed.number_of_nodes()} simpul terjangkau"
     )
+
+    st.caption(
 
 
 # =========================
