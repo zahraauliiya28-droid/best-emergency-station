@@ -1,99 +1,3 @@
-import streamlit as st
-import networkx as nx
-import osmnx as ox
-import pandas as pd
-import plotly.graph_objects as go
-from functools import lru_cache
-
-st.set_page_config(page_title="Best Emergency Station", page_icon="🚑", layout="wide")
-
-st.title("🚑 Best Emergency Station")
-st.caption("Proyek 08 Komputasi Graf • Lowokwaru, Kota Malang • NetworkX + Plotly + Streamlit")
-st.markdown(
-    "Aplikasi ini membandingkan calon pos darurat menggunakan jarak terpendek Dijkstra dan "
-    "eksentrisitas pada subgraf jalan OpenStreetMap yang terdiri dari 20 simpul. "
-    "Bobot adalah panjang jalan dalam meter, bukan waktu tempuh."
-)
-
-@st.cache_resource
-def build_graph():
-    import pickle
-    from pathlib import Path
-
-    file_graf = Path(__file__).parent / "graf_emergency_station.pkl"
-
-    with open(file_graf, "rb") as f:
-        data = pickle.load(f)
-
-    H = data["H"]
-    labels = data["labels"]
-    pos = data["pos"]
-    candidate_nodes = data["candidates"]
-
-    return H, labels, pos, candidate_nodes
-
-
-def analyze(graph):
-    distances = dict(nx.all_pairs_dijkstra_path_length(graph, weight="length"))
-    paths = dict(nx.all_pairs_dijkstra_path(graph, weight="length"))
-    n = graph.number_of_nodes()
-    if not all(len(distances[node]) == n for node in graph.nodes()):
-        raise ValueError("Validasi gagal: tidak semua simpul saling terjangkau.")
-    eccentricity = {node: max(distances[node].values()) for node in graph.nodes()}
-    radius = min(eccentricity.values())
-    centers = [node for node, e in eccentricity.items() if abs(e - radius) < 1e-9]
-    return distances, paths, eccentricity, radius, centers
-
-
-def edge_options(graph, labels):
-    options = []
-    for u, v, data in graph.edges(data=True):
-        text = f"{labels[u]} — {labels[v]} ({float(data['length']):.0f} m)"
-        options.append((text, (u, v)))
-    return sorted(options, key=lambda item: item[0])
-
-
-def graph_figure(graph, labels, pos, candidate, farthest, centers, path, selected_edge=None, animate=False):
-    # Draw the road network using node coordinates. Each simplified edge is shown as a segment.
-    edge_x, edge_y = [], []
-    for u, v in graph.edges():
-        edge_x += [pos[u][0], pos[v][0], None]
-        edge_y += [pos[u][1], pos[v][1], None]
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=edge_x, y=edge_y, mode="lines", name="Jalan / sisi graf",
-        line=dict(color="#AAB2BD", width=1.5), hoverinfo="skip"
-    ))
-    node_list = list(graph.nodes())
-    fig.add_trace(go.Scatter(
-        x=[pos[n][0] for n in node_list], y=[pos[n][1] for n in node_list],
-        mode="markers+text", text=[labels[n] for n in node_list], textposition="top center",
-        name="Persimpangan", marker=dict(size=9, color="#64748B"),
-        customdata=[[labels[n], n] for n in node_list],
-        hovertemplate="Simpul %{customdata[0]}<br>OSM ID: %{customdata[1]}<extra></extra>"
-    ))
-    if selected_edge is not None:
-        u, v = selected_edge
-        fig.add_trace(go.Scatter(x=[pos[u][0], pos[v][0]], y=[pos[u][1], pos[v][1]],
-            mode="lines", name="Ruas yang diubah", line=dict(color="#A855F7", width=6), hoverinfo="skip"))
-
-    route_x, route_y = [], []
-    for u, v in zip(path[:-1], path[1:]):
-        route_x += [pos[u][0], pos[v][0], None]
-        route_y += [pos[u][1], pos[v][1], None]
-    fig.add_trace(go.Scatter(x=route_x, y=route_y, mode="lines", name="Jalur terpendek ke titik terjauh",
-        line=dict(color="#F59E0B", width=4), hoverinfo="skip"))
-    fig.add_trace(go.Scatter(x=[pos[n][0] for n in centers], y=[pos[n][1] for n in centers],
-        mode="markers", name="Pusat graf", marker=dict(size=17, color="#16A34A", symbol="diamond", line=dict(color="white", width=1))))
-    fig.add_trace(go.Scatter(x=[pos[candidate][0]], y=[pos[candidate][1]], mode="markers+text",
-        text=["POS TERPILIH"], textposition="bottom center", name="Calon pos terpilih",
-        marker=dict(size=20, color="#2563EB", symbol="square", line=dict(color="white", width=1))))
-    fig.add_trace(go.Scatter(x=[pos[farthest][0]], y=[pos[farthest][1]], mode="markers+text",
-        text=["TERJAUH"], textposition="top center", name="Titik terjauh",
-        marker=dict(size=20, color="#DC2626", symbol="star", line=dict(color="white", width=1))))
-
-    if animate and len(path) > 1:
-        # Animate a marker along the shortest route. Plotly exposes Play/Pause controls.
         vehicle_index = len(fig.data)
         fig.add_trace(go.Scatter(x=[pos[path[0]][0]], y=[pos[path[0]][1]], mode="markers",
             name="Kendaraan (animasi)", marker=dict(size=15, color="#EA580C", symbol="circle")))
@@ -101,7 +5,7 @@ def graph_figure(graph, labels, pos, candidate, farthest, centers, path, selecte
         for i, node in enumerate(path):
             frames.append(go.Frame(name=str(i), data=[go.Scatter(x=[pos[node][0]], y=[pos[node][1]])], traces=[vehicle_index]))
         fig.frames = frames
-        fig.update_layout(updatemenus=[dict(type="buttons", showactive=False, x=0.02, y=1.13,
+        fig.update_layout(updatemenus=[dict(type="buttons", showactive=False, x=0.02, y=1.08,
             buttons=[dict(label="▶ Putar", method="animate", args=[None, {"frame": {"duration": 650, "redraw": True}, "fromcurrent": True}]),
                      dict(label="⏸ Jeda", method="animate", args=[[None], {"mode": "immediate", "frame": {"duration": 0, "redraw": False}, "transition": {"duration": 0}}])])])
     
@@ -156,10 +60,10 @@ m3.metric("Eksentrisitas calon terpilih", f"{changed_ecc[selected_node]/1000:.3f
 m4.metric("Radius graf", f"{changed_radius/1000:.3f} km", delta=f"{(changed_radius-base_radius)/1000:+.3f} km dari awal")
 
 st.subheader("1. Graf dan jalur menuju titik terjauh")
-col_graph, col_info = st.columns([1.7, 1])
+col_graph, col_info = st.columns([2.05, 1])
 with col_graph:
     st.plotly_chart(graph_figure(H_changed, labels, pos, selected_node, changed_far, changed_centers,
-        changed_path, selected_edge=selected_edge if factor != 1.0 else None, animate=show_animation), use_container_width=True)
+        changed_path, selected_edge=selected_edge if factor != 1.0 else None, animate=show_animation), width="stretch")
 with col_info:
     st.markdown("**Legenda**")
     st.markdown("- 🟦 Kotak biru: calon pos terpilih\n- 🟩 Berlian hijau: pusat graf\n- ⭐ Bintang merah: titik terjauh\n- 🟠 Garis oranye: jalur terpendek\n- 🟣 Garis ungu: ruas yang bobotnya dipilih untuk simulasi\n- 🟠 Titik bergerak: kendaraan pada animasi")
