@@ -104,12 +104,15 @@ def graph_figure(graph, labels, pos, candidate, farthest, centers, path, selecte
         fig.update_layout(updatemenus=[dict(type="buttons", showactive=False, x=0.02, y=1.13,
             buttons=[dict(label="▶ Putar", method="animate", args=[None, {"frame": {"duration": 650, "redraw": True}, "fromcurrent": True}]),
                      dict(label="⏸ Jeda", method="animate", args=[[None], {"mode": "immediate", "frame": {"duration": 0, "redraw": False}, "transition": {"duration": 0}}])])])
+    
     fig.update_layout(
-        height=620, margin=dict(l=10, r=10, t=50, b=10),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
-        xaxis_title="Longitude", yaxis_title="Latitude",
+        height=680,
+        margin=dict(l=30, r=20, t=100, b=55),
+        showlegend=False,
+        xaxis_title="Longitude",
+        yaxis_title="Latitude",
         xaxis=dict(scaleanchor="y", scaleratio=1),
-        title="Graf jalan Lowokwaru (subgraf 20 simpul)"
+        title=None
     )
     return fig
 
