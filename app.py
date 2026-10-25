@@ -38,6 +38,14 @@ st.markdown("""
     margin-top: 0;
     margin-bottom: 0.5rem;
 }
+.hero .author {
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    color: #DBEAFE;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
 .hero h1 {
     color: white;
     font-size: 2.05rem;
@@ -94,6 +102,7 @@ hr {
   <h1>🚑 Best Emergency Station</h1>
   <p>Analisis lokasi pos darurat · Lowokwaru, Kota Malang</p>
   <p>NetworkX · Dijkstra · Eccentricity · Streamlit</p>
+  <p class="author">Disusun oleh: Habibah Zahrotul Auliya · 240601110014</p>
 </div>
 """, unsafe_allow_html=True)
 
