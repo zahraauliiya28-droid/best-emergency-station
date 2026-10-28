@@ -4,6 +4,8 @@ import osmnx as ox
 import pandas as pd
 import plotly.graph_objects as go
 from functools import lru_cache
+import folium
+from streamlit_folium import st_folium
 
 st.set_page_config(
     page_title="Best Emergency Station",
@@ -219,6 +221,92 @@ def edge_options(graph, labels):
         options.append((text, (u, v)))
 
     return sorted(options, key=lambda item: item[0])
+
+def road_map_figure(
+    graph, labels, pos, candidate, farthest, centers,
+    path, selected_edge=None
+):
+    # Pusat peta berdasarkan koordinat seluruh simpul
+    latitudes = [pos[n][1] for n in graph.nodes()]
+    longitudes = [pos[n][0] for n in graph.nodes()]
+
+    center_lat = sum(latitudes) / len(latitudes)
+    center_lon = sum(longitudes) / len(longitudes)
+
+    # Peta dasar OpenStreetMap
+    m = folium.Map(
+        location=[center_lat, center_lon],
+        zoom_start=15,
+        tiles="OpenStreetMap"
+    )
+
+    # Jalur terpendek menuju titik terjauh
+    route_coords = [
+        [pos[n][1], pos[n][0]] for n in path
+    ]
+
+    folium.PolyLine(
+        route_coords,
+        color="#F59E0B",
+        weight=6,
+        opacity=0.9,
+        tooltip="Jalur terpendek"
+    ).add_to(m)
+
+    # Semua simpul jaringan
+    for node in graph.nodes():
+        if node in (candidate, farthest) or node in centers:
+            continue
+
+        folium.CircleMarker(
+            location=[pos[node][1], pos[node][0]],
+            radius=4,
+            color="#64748B",
+            fill=True,
+            fill_color="#94A3B8",
+            fill_opacity=0.9,
+            tooltip=f"Simpul: {labels[node]}"
+        ).add_to(m)
+
+    # Pusat graf
+    for node in centers:
+        folium.Marker(
+            location=[pos[node][1], pos[node][0]],
+            tooltip=f"Pusat graf: {labels[node]}",
+            icon=folium.Icon(color="green", icon="star")
+        ).add_to(m)
+
+    # Calon pos terpilih
+    folium.Marker(
+        location=[pos[candidate][1], pos[candidate][0]],
+        tooltip=f"Calon pos: {labels[candidate]}",
+        icon=folium.Icon(color="blue", icon="plus-sign")
+    ).add_to(m)
+
+    # Titik terjauh
+    folium.Marker(
+        location=[pos[farthest][1], pos[farthest][0]],
+        tooltip=f"Titik terjauh: {labels[farthest]}",
+        icon=folium.Icon(color="red", icon="flag")
+    ).add_to(m)
+
+    # Ruas jalan yang disimulasikan
+    if selected_edge is not None:
+        u, v = selected_edge
+        folium.PolyLine(
+            [
+                [pos[u][1], pos[u][0]],
+                [pos[v][1], pos[v][0]]
+            ],
+            color="#06B6D4",
+            weight=7,
+            opacity=1,
+            tooltip="Ruas yang disimulasikan"
+        ).add_to(m)
+
+    folium.LayerControl().add_to(m)
+    return m
+
 def graph_figure(
     graph, labels, pos, candidate, farthest, centers,
     path, selected_edge=None, animate=False
@@ -659,8 +747,9 @@ st.subheader("1. Visualisasi jaringan dan jalur terjauh")
 
 col_graph, col_info = st.columns([2.1, 1])
 
+
 with col_graph:
-    fig = graph_figure(
+    map_fig = road_map_figure(
         H_changed,
         labels,
         pos,
@@ -668,18 +757,16 @@ with col_graph:
         changed_far,
         changed_centers,
         changed_path,
-        selected_edge=selected_edge if factor != 1.0 else None,
-        animate=show_animation
+        selected_edge=selected_edge if factor != 1.0 else None
     )
 
-    st.plotly_chart(
-        fig,
+    st_folium(
+        map_fig,
         use_container_width=True,
-        config={
-            "displaylogo": False,
-            "responsive": True
-        }
+        height=590,
+        key="best_emergency_station_map"
     )
+
 
 with col_info:
     st.markdown("#### Keterangan graf")
