@@ -224,7 +224,7 @@ def edge_options(graph, labels):
 
 def road_map_figure(
     graph, labels, pos, candidate, farthest, centers,
-    path, selected_edge=None
+    path, selected_edge=None, animate=False
 ):
     # Pusat peta berdasarkan koordinat seluruh simpul
     latitudes = [pos[n][1] for n in graph.nodes()]
