@@ -797,5 +797,6 @@ st.warning(
 
 st.caption(
     "Best Emergency Station · Proyek 08 Komputasi Graf · "
-    "Lowokwaru, Kota Malang"    
+    "Lowokwaru, Kota Malang"
+)  
     
