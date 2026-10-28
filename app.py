@@ -11,7 +11,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# Tema visual dashboard
+
+# =========================
+# TEMA VISUAL DASHBOARD
+# =========================
 st.markdown("""
 <style>
 .block-container {
@@ -19,99 +22,142 @@ st.markdown("""
     padding-bottom: 2.5rem;
     max-width: 1500px;
 }
+
 .stApp {
-    background: linear-gradient(180deg, #F4F8FC 0%, #FFFFFF 42%);
+    background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 55%);
 }
+
 .hero {
-    background: linear-gradient(120deg, #10243A 0%, #173F67 62%, #2563EB 100%);
-    padding: 1.8rem 1.8rem 1.55rem 1.8rem;
-    border-radius: 20px;
+    background: linear-gradient(120deg, #0B1F33 0%, #123E63 58%, #087EAB 100%);
+    padding: 2rem;
+    border-radius: 22px;
     color: white;
-    box-shadow: 0 12px 28px rgba(16,36,58,.16);
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    overflow: visible;
+    box-shadow: 0 12px 30px rgba(11, 31, 51, 0.18);
+    margin: 0.5rem 0 1.4rem 0;
+    border: 1px solid rgba(255,255,255,0.15);
 }
+
 .hero .eyebrow {
-    display: block;
-    line-height: 1.5;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
+    color: #67E8F9 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.75rem !important;
+    font-weight: 800;
+    margin-bottom: 0.7rem;
 }
+
+.hero h1 {
+    color: #FFFFFF;
+    font-size: 2.35rem;
+    font-weight: 800;
+    margin: 0.2rem 0 0.7rem 0;
+    line-height: 1.2;
+}
+
+.hero p {
+    color: #DCEBFA;
+    font-size: 0.98rem;
+    margin: 0.35rem 0;
+}
+
+.hero .tagline {
+    color: #A5F3FC;
+    font-weight: 600;
+}
+
 .hero .author {
-    margin-top: 1rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.25);
-    color: #DBEAFE;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    margin-top: 1.2rem;
+    padding-top: 0.9rem;
+    color: #E0F2FE;
     font-size: 0.9rem;
     font-weight: 600;
 }
-.hero h1 {
-    color: white;
-    font-size: 2.05rem;
-    margin: 0 0 .35rem 0;
-}
-.hero p {
-    color: #DCEBFA;
-    margin: .2rem 0;
-    font-size: .98rem;
-}
-.eyebrow {
-    text-transform: uppercase;
-    letter-spacing: .14em;
-    font-size: .72rem !important;
-    font-weight: 700;
-    color: #93C5FD !important;
-}
+
 div[data-testid="stMetric"] {
-    background: white;
-    border: 1px solid #E2E8F0;
-    border-radius: 15px;
-    padding: 1rem 1.05rem;
-    box-shadow: 0 4px 14px rgba(15,23,42,.045);
+    background: #FFFFFF;
+    border: 1px solid #D8E7F5;
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 5px 16px rgba(15, 42, 75, 0.06);
 }
+
 div[data-testid="stMetricLabel"] {
-    color: #64748B;
+    color: #52677D;
+    font-weight: 600;
 }
+
 div[data-testid="stMetricValue"] {
-    color: #10243A;
+    color: #102A43;
+    font-weight: 800;
 }
+
 section[data-testid="stSidebar"] {
-    background: #F0F5FA;
-    border-right: 1px solid #DCE5EF;
+    background: #F0F7FC;
+    border-right: 1px solid #D5E5F2;
 }
+
+section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    color: #10243A;
+    color: #102A43;
 }
+
 h2, h3 {
-    color: #10243A;
+    color: #102A43;
 }
+
 div[data-testid="stDataFrame"] {
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
+    border: 1px solid #D8E7F5;
+    border-radius: 14px;
     overflow: hidden;
 }
+
+div[data-testid="stPlotlyChart"] {
+    background: #FFFFFF;
+    border: 1px solid #D8E7F5;
+    border-radius: 16px;
+    padding: 0.4rem;
+    box-shadow: 0 5px 16px rgba(15, 42, 75, 0.04);
+}
+
+div[data-testid="stAlert"] {
+    border-radius: 12px;
+}
+
 hr {
-    border-color: #E2E8F0;
+    border-color: #D8E7F5;
 }
 </style>
 
 <div class="hero">
-  <p class="eyebrow">PROYEK 08 · KOMPUTASI GRAF</p>
-  <h1>🚑 Best Emergency Station</h1>
-  <p>Analisis lokasi pos darurat · Lowokwaru, Kota Malang</p>
-  <p>NetworkX · Dijkstra · Eccentricity · Streamlit</p>
-  <p class="author">Disusun oleh: Habibah Zahrotul Auliya · 240601110014</p>
+    <p class="eyebrow">PROYEK 08 DARURAT</p>
+    <h1>🚑 Best Emergency Station</h1>
+    <p>Bandingkan calon lokasi pos darurat melalui jarak terjauh ke titik layanan.</p>
+    <p class="tagline">Eksentrisitas · Radius · Pusat Graf</p>
+        Graph Optimization · Dijkstra · Eccentricity · Network Analysis
+    </p>
+    <p>📍 Lowokwaru, Kota Malang</p>
+    <p class="author">
+        Disusun oleh: Habibah Zahrotul Auliya · 240601110014
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    "Aplikasi ini membandingkan calon pos darurat berdasarkan "
-    "**jarak terpendek Dijkstra** dan **eksentrisitas** pada subgraf "
-    "jalan yang terdiri dari 20 simpul. Bobot sisi menyatakan panjang "
-    "jalan (meter), bukan waktu tempuh."
-)
+
+st.markdown("""
+### 🎯 Tujuan Analisis
+
+Aplikasi ini digunakan untuk membandingkan calon lokasi pos darurat
+menggunakan algoritma **Dijkstra** dan konsep **eksentrisitas graf**.
+
+- 🛣️ **Jarak terpendek:** menghitung jarak melalui jaringan jalan.
+- 📍 **Eksentrisitas:** mengukur jarak maksimum dari suatu simpul ke simpul lain.
+- 🎯 **Rekomendasi:** membandingkan calon pos berdasarkan jarak terjauh terkecil.
+
+> **Catatan:** bobot sisi menyatakan panjang jalan dalam meter,
+> bukan estimasi waktu tempuh kendaraan.
+""")
 
 
 @st.cache_resource
@@ -228,7 +274,7 @@ def graph_figure(
             y=[pos[u][1], pos[v][1]],
             mode="lines",
             name="Ruas yang diubah",
-            line=dict(color="#A855F7", width=6),
+           line=dict(color="#06B6D4", width=6),
             hoverinfo="skip"
         ))
 
@@ -381,13 +427,14 @@ def graph_figure(
             )]
         )
 
+    
     # Tata letak graf
     fig.update_layout(
-        height=560,
-        margin=dict(l=45, r=25, t=75, b=45),
-        showlegend=False,
-        paper_bgcolor="white",
-        plot_bgcolor="#F8FAFC",
+        height=590,
+        margin=dict(l=35, r=25, t=70, b=40),
+        showlegend=True,
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F7FBFF",
         font=dict(
             family="Arial, sans-serif",
             color="#334155",
@@ -396,7 +443,7 @@ def graph_figure(
         xaxis=dict(
             title="Longitude",
             showgrid=True,
-            gridcolor="#E2E8F0",
+            gridcolor="#E2EAF2",
             zeroline=False,
             scaleanchor="y",
             scaleratio=1
@@ -404,12 +451,12 @@ def graph_figure(
         yaxis=dict(
             title="Latitude",
             showgrid=True,
-            gridcolor="#E2E8F0",
+            gridcolor="#E2EAF2",
             zeroline=False
         ),
         hoverlabel=dict(
-            bgcolor="#10243A",
-            font_color="white"
+            bgcolor="#102A43",
+            font_color="#FFFFFF"
         )
     )
 
@@ -427,51 +474,69 @@ except Exception as exc:
     st.stop()
 
 # =========================
+
+# =========================
 # SIDEBAR: KONTROL APLIKASI
 # =========================
-st.sidebar.title("🚑 Kontrol Dashboard")
-st.sidebar.caption("Atur simulasi jaringan jalan.")
+st.sidebar.markdown("## 🚑 Pusat Kontrol")
+st.sidebar.caption("Atur parameter untuk menguji jaringan jalan.")
+
+st.sidebar.markdown("### 📍 Lokasi Pos")
 
 candidate_name = st.sidebar.selectbox(
     "Pilih calon pos darurat",
     list(candidates.keys())
 )
 
+st.sidebar.divider()
+st.sidebar.markdown("### 🛣️ Simulasi Jalan")
+
 edge_items = edge_options(H, labels)
 edge_labels = [item[0] for item in edge_items]
 edge_lookup = {item[0]: item[1] for item in edge_items}
 
 edge_label = st.sidebar.selectbox(
-    "Pilih ruas jalan untuk diubah",
+    "Pilih ruas jalan",
     edge_labels
 )
 
 factor = st.sidebar.slider(
-    "Faktor panjang ruas",
+    "Faktor perubahan panjang",
     min_value=1.0,
     max_value=3.0,
     value=1.0,
     step=0.25,
     help=(
-        "1,00 = kondisi awal. Nilai lebih besar "
-        "mensimulasikan ruas yang menjadi lebih panjang."
+        "1,00 berarti kondisi awal. "
+        "Faktor lebih besar menyimulasikan ruas jalan yang lebih panjang."
     )
 )
 
 show_animation = st.sidebar.checkbox(
-    "Tampilkan animasi kendaraan",
+    "🚑 Aktifkan animasi kendaraan",
     value=True
 )
 
 st.sidebar.divider()
-st.sidebar.markdown("**Panduan warna graf**")
-st.sidebar.markdown(
-    "🟦 Calon pos terpilih  \n"
-    "🟩 Pusat graf  \n"
-    "⭐ Titik terjauh  \n"
-    "🟠 Jalur terpendek  \n"
-    "🟣 Ruas yang diubah  \n"
-    "🚑 Kendaraan animasi"
+st.sidebar.markdown("### 🎨 Legenda Graf")
+
+st.sidebar.markdown("""
+🟦 **Biru** — calon pos terpilih
+
+🟩 **Hijau** — pusat graf
+
+⭐ **Merah** — titik terjauh
+
+🟠 **Oranye** — jalur terpendek
+
+🟣 **Ungu** — ruas yang disimulasikan
+
+🚑 **Oranye bergerak** — kendaraan
+""")
+
+st.sidebar.info(
+    "Ubah calon pos atau faktor ruas untuk melihat "
+    "bagaimana hasil analisis jaringan berubah."
 )
 
 
@@ -507,65 +572,84 @@ changed_far = max(
 changed_path = changed_paths[selected_node][changed_far]
 
 
+
 # =========================
 # METRIK UTAMA
 # =========================
-st.subheader("Ringkasan jaringan")
+st.subheader("📊 Ringkasan Jaringan")
+
+ecc_delta = (
+    changed_ecc[selected_node] - base_ecc[selected_node]
+) / 1000
+
+radius_delta = (changed_radius - base_radius) / 1000
+
+ecc_delta_text = (
+    f"{ecc_delta:+.3f} km dari kondisi awal"
+    if abs(ecc_delta) > 1e-9
+    else "Tidak berubah dari kondisi awal"
+)
+
+radius_delta_text = (
+    f"{radius_delta:+.3f} km dari kondisi awal"
+    if abs(radius_delta) > 1e-9
+    else "Tidak berubah dari kondisi awal"
+)
 
 m1, m2, m3, m4 = st.columns(4)
 
 m1.metric(
-    "Jumlah simpul",
+    "🔵 Jumlah Simpul",
     H.number_of_nodes()
 )
 
 m2.metric(
-    "Jumlah sisi jalan",
+    "🛣️ Jumlah Sisi Jalan",
     H.number_of_edges()
 )
 
-ecc_delta_km = (changed_ecc[selected_node] - base_ecc[selected_node]) / 1000
-radius_delta_km = (changed_radius - base_radius) / 1000
-
 m3.metric(
-    "Eksentrisitas calon pos",
-     f"{changed_ecc[selected_node] / 1000:.3f} km",
-    delta=(
-        "Tidak berubah dari kondisi awal"
-        if abs(ecc_delta_km) < 1e-9
-        else f"{ecc_delta_km:+.3f} km dari kondisi awal"
-    ),
-    delta_color="off" if abs(ecc_delta_km) < 1e-9 else "normal"
+    "📏 Eksentrisitas Pos",
+    f"{changed_ecc[selected_node] / 1000:.3f} km",
+    delta=ecc_delta_text,
+    delta_color="off"
 )
 
 m4.metric(
-    "Radius graf",
+    "🎯 Radius Graf",
     f"{changed_radius / 1000:.3f} km",
-    delta=(
-        "Tidak berubah dari kondisi awal"
-        if abs(radius_delta_km) < 1e-9
-        else f"{radius_delta_km:+.3f} km dari kondisi awal"
-    ),
-    delta_color="off" if abs(radius_delta_km) < 1e-9 else "normal"
+    delta=radius_delta_text,
+    delta_color="off"
 )
 
+st.markdown("#### 🧪 Ringkasan Simulasi Ruas Jalan")
 
-# Ringkasan eksplisit ruas yang sedang disimulasikan.
-st.markdown("#### Ringkasan simulasi ruas jalan")
-sim_col1, sim_col2, sim_col3 = st.columns(3)
-sim_col1.metric("Panjang awal ruas", f"{original_length:.2f} m")
-sim_col2.metric("Faktor pengali", f"{factor:.2f}×")
-sim_col3.metric(
-    "Panjang ruas simulasi",
-    f"{simulated_length:.2f} m",
-    delta=f"{simulated_length - original_length:+.2f} m dari kondisi awal",
-    delta_color="off" if abs(simulated_length - original_length) < 1e-9 else "normal"
+simulated_length = float(H_changed[u][v]["length"])
+
+s1, s2, s3 = st.columns(3)
+
+s1.metric(
+    "Panjang Awal",
+    f"{original_length:,.2f} m"
 )
+
+s2.metric(
+    "Faktor Simulasi",
+    f"{factor:.2f}×"
+)
+
+s3.metric(
+    "Panjang Simulasi",
+    f"{simulated_length:,.2f} m",
+    delta=f"{simulated_length - original_length:+,.2f} m",
+    delta_color="off"
+)
+
 st.caption(
-    f"Ruas yang disimulasikan: {labels[u]} — {labels[v]}. "
-    "Perubahan ini mengubah bobot sisi pada model, bukan kondisi jalan nyata."
+    f"Ruas yang diuji: {labels[u]} — {labels[v]}. "
+    "Perubahan ini merupakan simulasi bobot matematis, "
+    "bukan perubahan kondisi jalan nyata."
 )
-
 
 # =========================
 # GRAF DAN RUTE
@@ -795,8 +879,23 @@ st.warning(
     "kondisi jalan satu arah."
 )
 
+# =========================
+# PERTANYAAN PRESENTASI
+# =========================
+st.divider()
+st.subheader("5. Pertanyaan Presentasi")
+
+st.markdown("""
+**Mengapa pos yang tampak berada di tengah gambar belum tentu menjadi pusat graf?**
+
+Posisi tengah pada gambar hanya menunjukkan letak geometris.
+Sementara itu, pusat graf ditentukan berdasarkan eksentrisitas,
+yaitu jarak terpendek maksimum dari suatu simpul ke seluruh simpul lain.
+Karena panjang dan susunan jalan berbeda-beda, simpul yang berada
+di tengah gambar belum tentu memiliki eksentrisitas minimum.
+""")
+
 st.caption(
     "Best Emergency Station · Proyek 08 Komputasi Graf · "
     "Lowokwaru, Kota Malang"
-)  
-    
+)
