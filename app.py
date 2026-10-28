@@ -204,7 +204,7 @@ def graph_figure(
         mode="markers+text",
         text=[labels[n] for n in node_list],
         textposition="top center",
-        textfont=dict(size=9, color="#334155"),
+        textfont=dict(size=10, color="#1E293B"),
         name="Persimpangan",
         marker=dict(
             size=9,
@@ -305,7 +305,7 @@ def graph_figure(
 
         fig.add_trace(go.Scatter(
             x=[pos[path[0]][0]],
-            y=[pos[path[0]][1]],
+                        y=[pos[path[0]][1]],
             mode="markers",
             name="Kendaraan",
             marker=dict(
@@ -485,6 +485,7 @@ u, v = selected_edge
 
 original_length = float(H[u][v]["length"])
 H_changed[u][v]["length"] = original_length * float(factor)
+simulated_length = float(H_changed[u][v]["length"])
 
 base_dist, base_paths, base_ecc, base_radius, base_centers = analyze(H)
 changed_dist, changed_paths, changed_ecc, changed_radius, changed_centers = analyze(
@@ -523,22 +524,46 @@ m2.metric(
     H.number_of_edges()
 )
 
+ecc_delta_km = (changed_ecc[selected_node] - base_ecc[selected_node]) / 1000
+radius_delta_km = (changed_radius - base_radius) / 1000
+
 m3.metric(
     "Eksentrisitas calon pos",
-    f"{changed_ecc[selected_node] / 1000:.3f} km",
+     f"{changed_ecc[selected_node] / 1000:.3f} km",
     delta=(
-        f"{(changed_ecc[selected_node] - base_ecc[selected_node]) / 1000:+.3f} km"
-        " dari kondisi awal"
-    )
+        "Tidak berubah dari kondisi awal"
+        if abs(ecc_delta_km) < 1e-9
+        else f"{ecc_delta_km:+.3f} km dari kondisi awal"
+    ),
+    delta_color="off" if abs(ecc_delta_km) < 1e-9 else "normal"
 )
 
 m4.metric(
     "Radius graf",
     f"{changed_radius / 1000:.3f} km",
     delta=(
-        f"{(changed_radius - base_radius) / 1000:+.3f} km"
-        " dari kondisi awal"
-    )
+        "Tidak berubah dari kondisi awal"
+        if abs(radius_delta_km) < 1e-9
+        else f"{radius_delta_km:+.3f} km dari kondisi awal"
+    ),
+    delta_color="off" if abs(radius_delta_km) < 1e-9 else "normal"
+)
+
+
+# Ringkasan eksplisit ruas yang sedang disimulasikan.
+st.markdown("#### Ringkasan simulasi ruas jalan")
+sim_col1, sim_col2, sim_col3 = st.columns(3)
+sim_col1.metric("Panjang awal ruas", f"{original_length:.2f} m")
+sim_col2.metric("Faktor pengali", f"{factor:.2f}×")
+sim_col3.metric(
+    "Panjang ruas simulasi",
+    f"{simulated_length:.2f} m",
+    delta=f"{simulated_length - original_length:+.2f} m dari kondisi awal",
+    delta_color="off" if abs(simulated_length - original_length) < 1e-9 else "normal"
+)
+st.caption(
+    f"Ruas yang disimulasikan: {labels[u]} — {labels[v]}. "
+    "Perubahan ini mengubah bobot sisi pada model, bukan kondisi jalan nyata."
 )
 
 
@@ -608,6 +633,10 @@ with col_info:
 # =========================
 st.divider()
 st.subheader("2. Perbandingan kondisi awal dan simulasi")
+st.caption(
+    "Kondisi awal memakai bobot jalan asli pada subgraf. "
+    "Kondisi simulasi memakai bobot ruas terpilih setelah dikalikan faktor."
+)
 
 compare_rows = []
 
@@ -768,5 +797,5 @@ st.warning(
 
 st.caption(
     "Best Emergency Station · Proyek 08 Komputasi Graf · "
-    "Lowokwaru, Kota Malang"
-)       
+    "Lowokwaru, Kota Malang"    
+    
