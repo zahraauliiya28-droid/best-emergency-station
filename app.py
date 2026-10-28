@@ -910,12 +910,12 @@ with col_info:
     st.markdown("#### Keterangan graf")
 
     st.markdown(
-    "🟦 **Kotak biru** — calon pos terpilih  \n"
-    "🟩 **Berlian hijau** — pusat graf  \n"
-    "⭐ **Bintang merah** — titik terjauh  \n"
-    "🟠 **Garis oranye** — jalur terpendek  \n"
-    "🟣 **Garis ungu** — ruas yang diubah  \n"
-    "🚑 **Titik bergerak** — animasi kendaraan"
+    "🟦 **Penanda biru (+)** — calon pos terpilih\n\n"
+    "🟩 **Bintang hijau** — pusat graf\n\n"
+    "🚩 **Bendera merah** — titik terjauh\n\n"
+    "🟠 **Garis oranye** — jalur terpendek menuju titik terjauh\n\n"
+    "🩵 **Garis biru muda** — ruas jalan yang disimulasikan\n\n"
+    "🚑 **Ambulans** — animasi kendaraan pada jalur"
 )
 
     st.divider()
