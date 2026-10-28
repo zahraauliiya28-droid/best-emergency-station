@@ -906,17 +906,27 @@ with col_graph:
     )
 
 
+
 with col_info:
     st.markdown("#### Keterangan graf")
 
     st.markdown(
-    "🟦 **Penanda biru (+)** — calon pos terpilih\n\n"
-    "🟩 **Bintang hijau** — pusat graf\n\n"
-    "🚩 **Bendera merah** — titik terjauh\n\n"
-    "🟠 **Garis oranye** — jalur terpendek menuju titik terjauh\n\n"
-    "🩵 **Garis biru muda** — ruas jalan yang disimulasikan\n\n"
-    "🚑 **Ambulans** — animasi kendaraan pada jalur"
-)
+        """
+        🟦 **Penanda biru (+)** — calon pos terpilih
+
+        🟩 **Bintang hijau** — pusat graf
+
+        🚩 **Bendera merah** — titik terjauh
+
+        🟠 **Garis oranye** — jalur terpendek menuju titik terjauh
+
+        <span style="color:#06B6D4; font-size:24px;">━━━━</span>
+        **Garis biru muda** — ruas jalan yang disimulasikan
+
+        🚑 **Ambulans** — animasi kendaraan pada jalur
+        """,
+        unsafe_allow_html=True
+    )
 
     st.divider()
     st.markdown("#### Informasi rute")
