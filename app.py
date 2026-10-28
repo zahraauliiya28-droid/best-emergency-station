@@ -335,7 +335,7 @@ def road_map_figure(
         animation._template = Template("""
         {% macro script(this, kwargs) %}
         (function() {
-            var map = {{ this._parent._parent.get_name() }};
+            var map = {{ this._parent.get_name() }};
             var marker = {{ this.marker_name }};
             var route = {{ this.route_json }};
             var timer = null;
