@@ -222,36 +222,41 @@ def edge_options(graph, labels):
 
     return sorted(options, key=lambda item: item[0])
 
+
 def road_map_figure(
     graph, labels, pos, candidate, farthest, centers,
     path, selected_edge=None, animate=False
 ):
-    # Pusat peta berdasarkan koordinat seluruh simpul
+    import json
+    import folium
+    from branca.element import MacroElement, Template
+
+    # Koordinat pos diasumsikan (longitude, latitude)
     latitudes = [pos[n][1] for n in graph.nodes()]
     longitudes = [pos[n][0] for n in graph.nodes()]
 
     center_lat = sum(latitudes) / len(latitudes)
     center_lon = sum(longitudes) / len(longitudes)
 
-    # Peta dasar OpenStreetMap
     m = folium.Map(
         location=[center_lat, center_lon],
         zoom_start=15,
         tiles="OpenStreetMap"
     )
 
-    # Jalur terpendek menuju titik terjauh
+    # Jalur rute dalam urutan latitude, longitude
     route_coords = [
         [pos[n][1], pos[n][0]] for n in path
     ]
 
-    folium.PolyLine(
-        route_coords,
-        color="#F59E0B",
-        weight=6,
-        opacity=0.9,
-        tooltip="Jalur terpendek"
-    ).add_to(m)
+    if len(route_coords) > 1:
+        folium.PolyLine(
+            route_coords,
+            color="#F59E0B",
+            weight=6,
+            opacity=0.95,
+            tooltip="Jalur terpendek Dijkstra"
+        ).add_to(m)
 
     # Semua simpul jaringan
     for node in graph.nodes():
@@ -260,11 +265,11 @@ def road_map_figure(
 
         folium.CircleMarker(
             location=[pos[node][1], pos[node][0]],
-            radius=4,
+            radius=3,
             color="#64748B",
             fill=True,
             fill_color="#94A3B8",
-            fill_opacity=0.9,
+            fill_opacity=0.8,
             tooltip=f"Simpul: {labels[node]}"
         ).add_to(m)
 
@@ -276,7 +281,7 @@ def road_map_figure(
             icon=folium.Icon(color="green", icon="star")
         ).add_to(m)
 
-    # Calon pos terpilih
+    # Calon pos
     folium.Marker(
         location=[pos[candidate][1], pos[candidate][0]],
         tooltip=f"Calon pos: {labels[candidate]}",
@@ -300,9 +305,142 @@ def road_map_figure(
             ],
             color="#06B6D4",
             weight=7,
-            opacity=1,
             tooltip="Ruas yang disimulasikan"
         ).add_to(m)
+
+    # Marker ambulans yang bisa bergerak
+    if len(route_coords) > 1:
+        ambulance = folium.Marker(
+            location=route_coords[0],
+            tooltip="Ambulans",
+            icon=folium.DivIcon(
+                html="""
+                <div style="
+                    font-size:30px;
+                    width:40px;
+                    height:40px;
+                    text-align:center;
+                    line-height:40px;
+                    filter:drop-shadow(1px 2px 2px #777);
+                ">🚑</div>
+                """,
+                icon_size=(40, 40),
+                icon_anchor=(20, 20)
+            )
+        )
+        ambulance.add_to(m)
+
+        # Kontrol animasi di dalam peta
+        animation = MacroElement()
+        animation._template = Template("""
+        {% macro script(this, kwargs) %}
+        (function() {
+            var map = {{ this._parent._parent.get_name() }};
+            var marker = {{ this.marker_name }};
+            var route = {{ this.route_json }};
+            var timer = null;
+            var segment = 0;
+            var progress = 0;
+            var playing = false;
+
+            var control = L.control({position: 'topleft'});
+
+            control.onAdd = function() {
+                var div = L.DomUtil.create('div', 'ambulance-control');
+                div.style.cssText =
+                    'background:white;padding:10px;border-radius:10px;' +
+                    'box-shadow:0 2px 8px #777;font-size:13px;' +
+                    'margin-top:65px;min-width:120px;';
+
+                div.innerHTML =
+                    '<b>🚑 Animasi Ambulans</b><br>' +
+                    '<button id="amb-start" style="margin:5px 2px 2px;padding:5px;">▶ Mulai</button>' +
+                    '<button id="amb-pause" style="margin:5px 2px 2px;padding:5px;">⏸ Jeda</button>' +
+                    '<button id="amb-reset" style="margin:5px 2px 2px;padding:5px;">↺ Ulangi</button>' +
+                    '<div id="amb-status">Siap dijalankan</div>';
+
+                L.DomEvent.disableClickPropagation(div);
+                L.DomEvent.disableScrollPropagation(div);
+                return div;
+            };
+
+            control.addTo(map);
+
+            function moveStep() {
+                if (segment >= route.length - 1) {
+                    clearInterval(timer);
+                    timer = null;
+                    playing = false;
+                    document.getElementById('amb-status').innerText =
+                        'Rute selesai';
+                    return;
+                }
+
+                progress += 0.04;
+
+                if (progress >= 1) {
+                    segment++;
+                    progress = 0;
+                }
+
+                var a = route[segment];
+                var b = route[segment + 1];
+
+                var lat = a[0] + (b[0] - a[0]) * progress;
+                var lon = a[1] + (b[1] - a[1]) * progress;
+
+                marker.setLatLng([lat, lon]);
+                document.getElementById('amb-status').innerText =
+                    'Berjalan: simpul ' + (segment + 1) +
+                    ' dari ' + route.length;
+            }
+
+            function startAnimation() {
+                if (playing) return;
+
+                if (segment >= route.length - 1) {
+                    segment = 0;
+                    progress = 0;
+                    marker.setLatLng(route[0]);
+                }
+
+                playing = true;
+                document.getElementById('amb-status').innerText =
+                    'Ambulans bergerak';
+
+                timer = setInterval(moveStep, 50);
+            }
+
+            function pauseAnimation() {
+                if (timer !== null) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+
+                playing = false;
+                document.getElementById('amb-status').innerText =
+                    'Animasi dijeda';
+            }
+
+            function resetAnimation() {
+                pauseAnimation();
+                segment = 0;
+                progress = 0;
+                marker.setLatLng(route[0]);
+                document.getElementById('amb-status').innerText =
+                    'Siap dijalankan';
+            }
+
+            document.getElementById('amb-start').onclick = startAnimation;
+            document.getElementById('amb-pause').onclick = pauseAnimation;
+            document.getElementById('amb-reset').onclick = resetAnimation;
+        })();
+        {% endmacro %}
+        """)
+
+        animation.marker_name = ambulance.get_name()
+        animation.route_json = json.dumps(route_coords)
+        m.add_child(animation)
 
     folium.LayerControl().add_to(m)
     return m
